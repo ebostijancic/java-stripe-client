@@ -15,5 +15,7 @@ repositories {
 
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter'
+	implementation 'com.stripe:stripe-java:10.0.2'
+
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
