@@ -1,10 +1,9 @@
 package com.github.ebostijancic.stripe;
 
+import com.stripe.exception.StripeException;
 import com.stripe.model.Customer;
 import com.stripe.model.Source;
 import org.junit.Test;
-
-import java.util.Optional;
 
 import static org.junit.Assert.*;
 
@@ -28,69 +27,68 @@ public class StripeClientImplTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void shouldFailToCreateCustomerWithEmptyEmail() {
+    public void shouldFailToCreateCustomerWithEmptyEmail() throws StripeException {
         client.addCustomer("");
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void shouldFailToCreateCustomerWithoutEmail() {
+    public void shouldFailToCreateCustomerWithoutEmail() throws StripeException {
         client.addCustomer(null);
     }
 
     @Test
-    public void shouldSucceedToCreateCustomerWithEmail() {
+    public void shouldSucceedToCreateCustomerWithEmail() throws StripeException {
         final String customerEmail = "emil.bostijancic@gmail.com";
 
-        Optional<Customer> customer = client.addCustomer(customerEmail);
+        Customer customer = client.addCustomer(customerEmail);
 
-        assertTrue(customer.isPresent());
-        assertNotNull(customer.get());
-        assertEquals(customerEmail, customer.get().getEmail());
+        assertNotNull(customer);
+        assertEquals(customerEmail, customer.getEmail());
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void shouldFailToAttachCreditCardSourceWithoutCustomer() {
+    public void shouldFailToAttachCreditCardSourceWithoutCustomer() throws StripeException {
         client.attachCreditCardSource(null);
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void shouldFailToAttachCreditCardSourceWithoutCustomerEmail() {
+    public void shouldFailToAttachCreditCardSourceWithoutCustomerEmail() throws StripeException {
         client.attachCreditCardSource(new Customer());
     }
 
     @Test
-    public void shouldCreateCreditCardSourceWithValidCustomer() {
-        Optional<Customer> customer = client.addCustomer("emil.bostijancic@gmail.com");
+    public void shouldCreateCreditCardSourceWithValidCustomer() throws StripeException {
+        Customer customer = client.addCustomer("emil.bostijancic@gmail.com");
 
-        Optional<Source> source = client.attachCreditCardSource(customer.get());
+        Source source = client.attachCreditCardSource(customer);
 
-        assertTrue(source.isPresent());
+        assertTrue(source != null);
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void shouldFailToCreateChargeForEmptyAmount() {
+    public void shouldFailToCreateChargeForEmptyAmount() throws StripeException {
         client.chargeAmount(null, null, null);
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void shouldFailToCreateChargeForZeroAmount() {
+    public void shouldFailToCreateChargeForZeroAmount() throws StripeException {
         client.chargeAmount(0.0f, null, null);
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void shouldFailWithLowerChargenThanMinimalChargeAmount() {
+    public void shouldFailWithLowerChargenThanMinimalChargeAmount() throws StripeException {
         client.chargeAmount(0.4999f, null, null);
     }
 
     @Test
-    public void shouldSucceedToChargeValidAmount() {
-        Optional<Customer> customer = client.addCustomer("emil.bostijancic@gmail.com");
+    public void shouldSucceedToChargeValidAmount() throws StripeException {
+        Customer customer = client.addCustomer("emil.bostijancic@gmail.com");
 
-        Optional<Source> source = client.attachCreditCardSource(customer.get());
+        Source source = client.attachCreditCardSource(customer);
 
-        assertTrue(client.chargeAmount(100.0f, customer.get(), source.get()));
-
+        assertNotNull(client.chargeAmount(100.0f, customer, source));
     }
+
 
 }
 

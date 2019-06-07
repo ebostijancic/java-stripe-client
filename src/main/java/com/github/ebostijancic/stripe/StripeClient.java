@@ -1,15 +1,43 @@
 package com.github.ebostijancic.stripe;
 
+import com.stripe.Stripe;
+import com.stripe.exception.StripeException;
+import com.stripe.model.Charge;
 import com.stripe.model.Customer;
 import com.stripe.model.Source;
 
-import java.util.Optional;
-
 public interface StripeClient {
 
-    Optional<Customer> addCustomer(final String email) throws IllegalArgumentException;
+    /**
+     * Adds a new customer to the account by it's email.
+     *
+     * @param email email address of the customer
+     * @return optionally a Customer object containing all customer information.
+     * @throws IllegalArgumentException in case an invalid email address was given.
+     */
+    Customer addCustomer(final String email) throws IllegalArgumentException, StripeException;
 
-    Optional<Source> attachCreditCardSource(final Customer customer) throws IllegalArgumentException;
+    /**
+     * Attaches a credit card source to a given customer, so that it can be used to
+     * charge the customer through this source.
+     *
+     * @param customer Customer to attach the credit card.
+     * @return optionally the create attached credit card source.
+     * @throws IllegalArgumentException when customer is invalid.
+     */
+    Source attachCreditCardSource(final Customer customer) throws IllegalArgumentException, StripeException;
 
-    boolean chargeAmount(final Float amount, final Customer customer, final Source source) throws IllegalArgumentException;
+    /**
+     * Charges a given amount of the customer,
+     *
+     * TODO probably use Money API for the amount
+     *
+     * @param amount the amount to charge
+     * @param customer the customer to charge
+     * @param source the source of which the charge is going to be used.
+     * @return the created charge which can be further processed.
+     * @throws IllegalArgumentException in case amount, customer or source is invalid.
+     */
+    Charge chargeAmount(final Float amount, final Customer customer, final Source source)
+            throws IllegalArgumentException, StripeException;
 }

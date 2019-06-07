@@ -6,6 +6,7 @@ import com.stripe.model.Customer;
 import com.stripe.model.Source;
 import com.stripe.net.RequestOptions;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.PostConstruct;
@@ -13,6 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+@Component
 public class StripeClientImpl implements StripeClient {
 
     private final RequestOptions requestOptions;
@@ -20,13 +22,10 @@ public class StripeClientImpl implements StripeClient {
     // Stripe's minimal amount to charge a customer.
     private final static float MINIMAL_AMOUNT = 0.5f;
 
+    private static final String DEFAULT_TOKEN = "tok_at";
+
     @Value("${stripe.api_key}")
     private String stripeApiKey;
-
-    @PostConstruct
-    public void init() {
-
-    }
 
     public StripeClientImpl(@Value("${stripe.api_key}") String stripeApiKey) throws IllegalArgumentException {
         if (StringUtils.isEmpty(stripeApiKey)) {
@@ -41,7 +40,7 @@ public class StripeClientImpl implements StripeClient {
     }
 
     @Override
-    public Optional<Customer> addCustomer(final String email) throws IllegalArgumentException {
+    public Customer addCustomer(final String email) throws IllegalArgumentException, StripeException {
         if (StringUtils.isEmpty(email)) {
             throw new IllegalArgumentException("No email for customer given");
         }
@@ -49,16 +48,11 @@ public class StripeClientImpl implements StripeClient {
         final Map<String, Object> params = new HashMap<>();
         params.put("email", email);
 
-        try {
-            final Customer customer = Customer.create(params, requestOptions);
-            return Optional.of(customer);
-        } catch (StripeException e) {
-            return Optional.empty();
-        }
+        return Customer.create(params, requestOptions);
     }
 
     @Override
-    public Optional<Source> attachCreditCardSource(final Customer customer) throws IllegalArgumentException {
+    public Source attachCreditCardSource(final Customer customer) throws IllegalArgumentException, StripeException {
 
         if (customer == null || StringUtils.isEmpty(customer.getEmail())) {
             throw new IllegalArgumentException("No valid customer given");
@@ -69,24 +63,19 @@ public class StripeClientImpl implements StripeClient {
 
         final Map<String, Object> sourceParams = new HashMap<>();
         sourceParams.put("type", "card");
-        sourceParams.put("token", "tok_at");
+        sourceParams.put("token", DEFAULT_TOKEN);
         sourceParams.put("owner", owner);
 
-        try {
-            final Source source = Source.create(sourceParams, this.requestOptions);
-            return Optional.of(source);
-        } catch (StripeException e) {
-            return Optional.empty();
-        }
+        return Source.create(sourceParams, this.requestOptions);
     }
 
 
     @Override
-    public boolean chargeAmount(final Float amount, final Customer customer, final Source source)
-            throws IllegalArgumentException {
+    public Charge chargeAmount(final Float amount, final Customer customer, final Source source)
+            throws IllegalArgumentException, StripeException {
 
-        if (amount == null || amount.floatValue() == 0.0f) {
-            throw new IllegalArgumentException("No or zero amount to charge given.");
+        if (amount == null) {
+            throw new IllegalArgumentException("No amount to charge given.");
         }
 
         if (amount.floatValue() < MINIMAL_AMOUNT) {
@@ -108,13 +97,6 @@ public class StripeClientImpl implements StripeClient {
         params.put("source", source.getId());
         params.put("currency", "eur");
 
-        try {
-            Charge charge = Charge.create(params, requestOptions);
-            return true;
-        } catch (StripeException e) {
-            e.getStripeError();
-        }
-
-        return false;
+        return Charge.create(params, requestOptions);
     }
 }
