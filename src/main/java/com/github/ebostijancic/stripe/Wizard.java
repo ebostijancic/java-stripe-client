@@ -7,13 +7,11 @@ import com.stripe.model.Source;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.Optional;
 import java.util.Scanner;
 
 @Component
 public class Wizard {
     private StripeClient client;
-    private final Scanner scanner = new Scanner(System.in);
 
     public Wizard(@Autowired StripeClient client) {
         this.client = client;
@@ -22,6 +20,8 @@ public class Wizard {
     public Customer addCustomer() {
         System.out.println("Please enter email of customer");
         String email;
+
+        final Scanner scanner = new Scanner(System.in);
 
         do {
             email = scanner.nextLine();
@@ -43,21 +43,23 @@ public class Wizard {
     public Charge chargeCustomer(final Customer customer) {
         System.out.println("Please enter amount in EUR to charge the customer");
 
-        Float amount;
+        final Scanner scanner = new Scanner(System.in);
+        float amount;
 
         do {
             amount = scanner.nextFloat();
             if (StripeUtil.isValidAmount(amount) == false) {
                 System.out.println("Given amount is invalid, please enter amount higher than 0.5 EUR");
             }
-        } while(StripeUtil.isValidAmount(amount));
+        } while(StripeUtil.isValidAmount(amount) == false);
 
         try {
             final Source source = client.attachCreditCardSource(customer);
             final Charge charge = client.chargeAmount(amount, customer, source);
             return charge;
 
-        } catch (IllegalArgumentException | StripeException e) {
+        } catch (Exception e) {
+            System.out.println("Error charging customer");
             e.printStackTrace();
         }
 
@@ -69,4 +71,5 @@ public class Wizard {
 
         return -1;
     }
+
 }

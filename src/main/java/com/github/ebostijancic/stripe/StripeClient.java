@@ -38,6 +38,6 @@ public interface StripeClient {
      * @return the created charge which can be further processed.
      * @throws IllegalArgumentException in case amount, customer or source is invalid.
      */
-    Charge chargeAmount(final Float amount, final Customer customer, final Source source)
+    Charge chargeAmount(final float amount, final Customer customer, final Source source)
             throws IllegalArgumentException, StripeException;
 }

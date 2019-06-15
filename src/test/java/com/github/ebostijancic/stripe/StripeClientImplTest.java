@@ -67,7 +67,7 @@ public class StripeClientImplTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void shouldFailToCreateChargeForEmptyAmount() throws StripeException {
-        client.chargeAmount(null, null, null);
+        client.chargeAmount(0.0f, null, null);
     }
 
     @Test(expected = IllegalArgumentException.class)

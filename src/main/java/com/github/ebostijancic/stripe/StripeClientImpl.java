@@ -71,14 +71,14 @@ public class StripeClientImpl implements StripeClient {
 
 
     @Override
-    public Charge chargeAmount(final Float amount, final Customer customer, final Source source)
+    public Charge chargeAmount(final float amount, final Customer customer, final Source source)
             throws IllegalArgumentException, StripeException {
 
-        if (amount == null) {
+        if (amount == 0.0f) {
             throw new IllegalArgumentException("No amount to charge given.");
         }
 
-        if (amount.floatValue() < MINIMAL_AMOUNT) {
+        if (amount < MINIMAL_AMOUNT) {
             throw new IllegalArgumentException("Given amount is below the minimal allowed charge amount");
         }
 
