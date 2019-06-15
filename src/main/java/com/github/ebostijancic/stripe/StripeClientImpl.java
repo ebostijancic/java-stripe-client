@@ -3,16 +3,15 @@ package com.github.ebostijancic.stripe;
 import com.stripe.exception.StripeException;
 import com.stripe.model.Charge;
 import com.stripe.model.Customer;
+import com.stripe.model.Refund;
 import com.stripe.model.Source;
 import com.stripe.net.RequestOptions;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
-import javax.annotation.PostConstruct;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 @Component
 public class StripeClientImpl implements StripeClient {
@@ -96,7 +95,25 @@ public class StripeClientImpl implements StripeClient {
         params.put("amount", chargeAmount);
         params.put("source", source.getId());
         params.put("currency", "eur");
+        params.put("capture",   false);
 
         return Charge.create(params, requestOptions);
+    }
+
+    @Override
+    public Charge captureCharge(final Charge charge) throws IllegalArgumentException, StripeException {
+        if (charge == null || StringUtils.isEmpty(charge.getId())) {
+            throw new IllegalArgumentException("Invalid charge given");
+        }
+
+        if (charge.getCaptured()) {
+            throw new IllegalArgumentException("charge already captured");
+        }
+        return charge.capture(requestOptions);
+    }
+
+    @Override
+    public Refund refundCharge(final Charge charge) {
+        throw new RuntimeException("Not implemented yet");
     }
 }

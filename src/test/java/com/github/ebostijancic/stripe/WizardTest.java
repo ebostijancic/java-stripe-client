@@ -96,5 +96,4 @@ public class WizardTest {
             super(message, requestId, code, statusCode);
         }
     }
-
 }

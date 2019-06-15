@@ -1,9 +1,9 @@
 package com.github.ebostijancic.stripe;
 
-import com.stripe.Stripe;
 import com.stripe.exception.StripeException;
 import com.stripe.model.Charge;
 import com.stripe.model.Customer;
+import com.stripe.model.Refund;
 import com.stripe.model.Source;
 
 public interface StripeClient {
@@ -40,4 +40,8 @@ public interface StripeClient {
      */
     Charge chargeAmount(final float amount, final Customer customer, final Source source)
             throws IllegalArgumentException, StripeException;
+
+    Charge captureCharge(final Charge charge) throws IllegalArgumentException, StripeException;
+
+    Refund refundCharge(final Charge charge) throws IllegalArgumentException, StripeException;
 }
