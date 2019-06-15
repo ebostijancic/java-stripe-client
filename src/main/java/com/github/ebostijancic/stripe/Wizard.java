@@ -4,6 +4,7 @@ import com.stripe.Stripe;
 import com.stripe.exception.StripeException;
 import com.stripe.model.Charge;
 import com.stripe.model.Customer;
+import com.stripe.model.Refund;
 import com.stripe.model.Source;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -71,6 +72,8 @@ public class Wizard {
         try {
             final Source source = client.attachCreditCardSource(customer);
             final Charge charge = client.chargeAmount(amount, customer, source);
+
+            System.out.println("Successfully created charge");
             return charge;
 
         } catch (Exception e) {
@@ -81,7 +84,7 @@ public class Wizard {
         return null;
     }
 
-    public int refundOrCapture(final Charge charge) {
+    public int refundOrCapture(final Charge charge) throws StripeException {
         System.out.println("Do you want to capture or refund the charge? (C/R)");
 
         final Scanner scanner = new Scanner(System.in);
@@ -96,7 +99,21 @@ public class Wizard {
             }
         } while(StripeUtil.isValidAnswer(answer) == false);
 
+        if (StripeUtil.isRefund(answer)) {
+            final Refund refund = client.refundCharge(charge);
 
+            if (refund.getStatus().equals("succeeded")) {
+                System.out.println("Successfully refunded charge");
+                return 0;
+            }
+        } else if (StripeUtil.isCapture(answer)) {
+            final Charge captured = client.captureCharge(charge);
+
+            if (captured.getCaptured()) {
+                System.out.println("Succeesfully captured charge");
+                return 0;
+            }
+        }
         return -1;
     }
 }

@@ -29,6 +29,7 @@ public class JavaStripeClientApplication implements CommandLineRunner {
 			System.exit(1);
 		}
 
+		System.out.println("Customer created");
 		final Charge charge = wizard.chargeCustomer(customer);
 
 		if (charge == null) {

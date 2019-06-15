@@ -23,19 +23,22 @@ public class StripeClientImpl implements StripeClient {
 
     private static final String DEFAULT_TOKEN = "tok_at";
 
-    @Value("${stripe.api_key}")
     private String stripeApiKey;
 
-    public StripeClientImpl(@Value("${stripe.api_key}") String stripeApiKey) throws IllegalArgumentException {
-        if (StringUtils.isEmpty(stripeApiKey)) {
+    public StripeClientImpl(final String apiKey) {
+        if (StringUtils.isEmpty(apiKey)) {
             throw new IllegalArgumentException("No api key given");
         }
 
-        this.stripeApiKey = stripeApiKey;
+        this.stripeApiKey = apiKey;
 
         this.requestOptions = RequestOptions.builder()
                 .setApiKey(stripeApiKey)
                 .build();
+    }
+
+    public StripeClientImpl() throws IllegalArgumentException {
+        this("sk_test_4eC39HqLyjWDarjtT1zdp7dc");
     }
 
     @Override
@@ -113,7 +116,14 @@ public class StripeClientImpl implements StripeClient {
     }
 
     @Override
-    public Refund refundCharge(final Charge charge) {
-        throw new RuntimeException("Not implemented yet");
+    public Refund refundCharge(final Charge charge) throws StripeException {
+        if (charge == null || StringUtils.isEmpty(charge.getId())) {
+            throw new IllegalArgumentException("invalid charge given");
+        }
+
+        Map<String, Object> params = new HashMap<>();
+        params.put("charge", charge.getId());
+
+        return Refund.create(params, requestOptions);
     }
 }

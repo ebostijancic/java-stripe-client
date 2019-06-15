@@ -32,7 +32,10 @@ public class StripeUtil {
 
         final String lowerAnswer = answer.toLowerCase();
 
-        return (CAPTURE_SHORT.equals(lowerAnswer) || CAPTURE_LONG.equals(lowerAnswer) || REFUND_SHORT.equals(lowerAnswer) || REFUND_LONG.equals(lowerAnswer));
+        return (CAPTURE_SHORT.equals(lowerAnswer) ||
+                CAPTURE_LONG.equals(lowerAnswer) ||
+                REFUND_SHORT.equals(lowerAnswer) ||
+                REFUND_LONG.equals(lowerAnswer));
     }
 
     public static boolean isRefund(final String answer) {

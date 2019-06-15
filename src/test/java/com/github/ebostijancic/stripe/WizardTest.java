@@ -3,6 +3,7 @@ package com.github.ebostijancic.stripe;
 import com.stripe.exception.StripeException;
 import com.stripe.model.Charge;
 import com.stripe.model.Customer;
+import com.stripe.model.Refund;
 import com.stripe.model.Source;
 import org.junit.Assert;
 import org.junit.Before;
@@ -83,8 +84,30 @@ public class WizardTest {
 
 
     @Test
-    public void refundOrCapture() {
+    public void shouldRefundCharge() throws StripeException {
+        final InputStream in = new ByteArrayInputStream("r".getBytes());
+        System.setIn(in);
 
+        final Charge charge = Mockito.mock(Charge.class);
+        final Refund refund = Mockito.mock(Refund.class);
+        Mockito.when(refund.getStatus()).thenReturn("succeeded");
+
+        Mockito.when(client.refundCharge(charge)).thenReturn(refund);
+
+        assertEquals(0, wizard.refundOrCapture(charge));
+    }
+
+    @Test
+    public void shouldCaptureCharge() throws StripeException {
+        final InputStream in = new ByteArrayInputStream("c".getBytes());
+        System.setIn(in);
+
+        final Charge charge = Mockito.mock(Charge.class);
+        Mockito.when(charge.getCaptured()).thenReturn(Boolean.TRUE);
+
+        Mockito.when(client.captureCharge(charge)).thenReturn(charge);
+
+        assertEquals(0, wizard.refundOrCapture(charge));
     }
 
     public static class MockStripeException extends StripeException {

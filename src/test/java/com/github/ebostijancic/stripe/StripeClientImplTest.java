@@ -163,5 +163,16 @@ public class StripeClientImplTest {
         assertNotNull(refund);
         assertEquals("succeeded", refund.getStatus());
     }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void shouldFailToRefundInvalidCharge() throws StripeException {
+        final Customer customer = client.addCustomer("emil.bostijancic@gmail.com");
+
+        final Source source = client.attachCreditCardSource(customer);
+
+        final Charge charge = new Charge();
+        client.refundCharge(charge);
+    }
+
 }
 
