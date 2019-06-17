@@ -41,7 +41,21 @@ public interface StripeClient {
     Charge chargeAmount(final float amount, final Customer customer, final Source source)
             throws IllegalArgumentException, StripeException;
 
+    /**
+     * Captures a given charge
+     * @param charge Charge to capture
+     * @return captured charge
+     * @throws IllegalArgumentException in case an invalid charge was given
+     * @throws StripeException in case the capture action failed
+     */
     Charge captureCharge(final Charge charge) throws IllegalArgumentException, StripeException;
 
+    /**
+     * Refunds a given charge.
+     * @param charge Charge to refund
+     * @return Refund object for the created refund.
+     * @throws IllegalArgumentException in case an invalid charge was given
+     * @throws StripeException in case the refund action failed
+     */
     Refund refundCharge(final Charge charge) throws IllegalArgumentException, StripeException;
 }
