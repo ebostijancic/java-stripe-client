@@ -52,4 +52,12 @@ public class StripeUtilTest {
         assertFalse(StripeUtil.isCapture("refund"));
         assertFalse(StripeUtil.isCapture("anyother"));
     }
+
+    @Test
+    public void shouldValidateAmount() {
+        assertFalse(StripeUtil.isValidAmount(0.4f));
+        assertTrue(StripeUtil.isValidAmount(0.5f));
+        assertTrue(StripeUtil.isValidAmount(1.5f));
+        assertTrue(StripeUtil.isValidAmount(100.5f));
+    }
 }

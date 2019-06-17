@@ -18,7 +18,7 @@ public class StripeUtil {
     }
 
     public static boolean isValidAmount(final float amount) {
-        return amount > MINIMAL_AMOUNT;
+        return amount >= MINIMAL_AMOUNT;
     }
 
     public static boolean isValidEmail(final String email) {
